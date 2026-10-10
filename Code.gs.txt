@@ -1,0 +1,267 @@
+const SHEET_NAME = "Responses";
+const EXCEL_FILE_NAME = "ASHA_AWW_AWH_WHV_Data.xlsx";
+const DRIVE_FOLDER_NAME = "ASHA_AWW_AWH_WHV_Data";
+
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile("Index")
+    .setTitle("ASHA / AWW / AWH / WHV Family Details")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function setup() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  let sheet = ss.getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+  }
+
+  const headers = [
+    "Timestamp",
+    "Scheme Name",
+    "ID_Number",
+    "error_code",
+    "error_msg",
+    "family_guid",
+    "family_id - RATION CARD",
+    "member_id",
+    "state_lgd_code",
+    "district_lgd_code",
+    "subdistrict_lgd_code",
+    "village_town_lgd_code",
+    "pincode",
+    "member_name_eng",
+    "member_name_regional",
+    "mother_name_eng",
+    "mother_name_regional",
+    "father_name_eng",
+    "father_name_regional",
+    "spouse_name_eng",
+    "spouse_name_regional",
+    "year_of_birth",
+    "mobile_number",
+    "relation_name",
+    "gender",
+    "address",
+    "aadhaar_number",
+    "More than one ASHA/AWW/AWH/WHV in family?",
+    "ID_Numbers of all ASHA/AWW/AWH/WHV",
+    "Primary ASHA/AWW/AWH/WHV ID_Number",
+    "Other field affecting WHV benefits"
+  ];
+
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+  }
+
+  return "Setup completed successfully.";
+}
+
+
+function submitForm(data) {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    setup();
+    sheet = ss.getSheetByName(SHEET_NAME);
+  }
+
+  // Basic validation
+  if (!data.scheme_name)
+    throw new Error("Scheme Name is required.");
+
+  if (!data.id_number)
+    throw new Error("ID_Number is required.");
+
+  if (!data.family_guid)
+    throw new Error("family_guid is required.");
+
+  if (!data.family_id)
+    throw new Error("family_id is required.");
+
+  if (!data.member_name_eng)
+    throw new Error("Member Name is required.");
+
+  if (!data.year_of_birth)
+    throw new Error("Year of Birth is required.");
+
+  if (!data.relation_name)
+    throw new Error("Relation Name is required.");
+
+  if (!data.gender)
+    throw new Error("Gender is required.");
+
+  if (!data.aadhaar_number)
+    throw new Error("Aadhaar Number is required.");
+
+  // Aadhaar validation
+  const aadhaar = String(data.aadhaar_number).replace(/\s/g, "");
+
+  if (!/^\d{12}$/.test(aadhaar)) {
+    throw new Error("Aadhaar Number must contain exactly 12 digits.");
+  }
+
+  // Mobile validation if entered
+  if (data.mobile_number) {
+    const mobile = String(data.mobile_number).replace(/\s/g, "");
+
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      throw new Error("Enter a valid 10-digit mobile number.");
+    }
+  }
+
+  // Multiple worker validation
+  if (data.multiple_worker === "Yes") {
+
+    if (!data.all_worker_ids) {
+      throw new Error(
+        "Please enter all ASHA/AWW/AWH/WHV ID_Numbers."
+      );
+    }
+
+    if (!data.primary_worker_id) {
+      throw new Error(
+        "Please enter the Primary ASHA/AWW/AWH/WHV ID_Number."
+      );
+    }
+  }
+
+  const row = [
+    new Date(),
+    data.scheme_name || "",
+    data.id_number || "",
+    data.error_code || "",
+    data.error_msg || "",
+    data.family_guid || "",
+    data.family_id || "",
+    data.member_id || "",
+    data.state_lgd_code || "",
+    data.district_lgd_code || "",
+    data.subdistrict_lgd_code || "",
+    data.village_town_lgd_code || "",
+    data.pincode || "",
+    data.member_name_eng || "",
+    data.member_name_regional || "",
+    data.mother_name_eng || "",
+    data.mother_name_regional || "",
+    data.father_name_eng || "",
+    data.father_name_regional || "",
+    data.spouse_name_eng || "",
+    data.spouse_name_regional || "",
+    data.year_of_birth || "",
+    data.mobile_number || "",
+    data.relation_name || "",
+    data.gender || "",
+    data.address || "",
+    aadhaar,
+    data.multiple_worker || "",
+    data.all_worker_ids || "",
+    data.primary_worker_id || "",
+    data.other_benefit_field || ""
+  ];
+
+  sheet.appendRow(row);
+
+  // Format columns as text where required
+  sheet.getRange(sheet.getLastRow(), 3, 1, 11)
+       .setNumberFormat("@");
+
+  sheet.getRange(sheet.getLastRow(), 22, 1, 6)
+       .setNumberFormat("@");
+
+  SpreadsheetApp.flush();
+
+  // Update Excel file
+  createOrUpdateExcelFile();
+
+  return {
+    success: true,
+    message: "Data submitted successfully."
+  };
+}
+
+
+/**
+ * Create/update Excel file in Google Drive
+ */
+function createOrUpdateExcelFile() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const folder = getOrCreateFolder(DRIVE_FOLDER_NAME);
+
+  // Export Google Sheet as XLSX
+  const url =
+    "https://docs.google.com/spreadsheets/d/" +
+    ss.getId() +
+    "/export?format=xlsx";
+
+  const token = ScriptApp.getOAuthToken();
+
+  const response = UrlFetchApp.fetch(url, {
+    headers: {
+      Authorization: "Bearer " + token
+    },
+    muteHttpExceptions: true
+  });
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error(
+      "Excel export failed. HTTP Code: " +
+      response.getResponseCode()
+    );
+  }
+
+  const blob = response
+    .getBlob()
+    .setName(EXCEL_FILE_NAME);
+
+  // Remove old Excel file
+  const oldFiles = folder.getFilesByName(EXCEL_FILE_NAME);
+
+  while (oldFiles.hasNext()) {
+    oldFiles.next().setTrashed(true);
+  }
+
+  // Create latest Excel file
+  const newFile = folder.createFile(blob);
+
+  return newFile.getUrl();
+}
+
+
+/**
+ * Create Drive folder if it does not exist
+ */
+function getOrCreateFolder(folderName) {
+
+  const folders = DriveApp.getFoldersByName(folderName);
+
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+
+  return DriveApp.createFolder(folderName);
+}
+
+
+/**
+ * Get Excel file link
+ */
+function getExcelFileUrl() {
+
+  const folder = getOrCreateFolder(DRIVE_FOLDER_NAME);
+
+  const files = folder.getFilesByName(EXCEL_FILE_NAME);
+
+  if (files.hasNext()) {
+    return files.next().getUrl();
+  }
+
+  return "";
+}

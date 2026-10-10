@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 25px auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .required {
+      color: red;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #c8ccd0;
+      border-radius: 7px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4285f4;
+    }
+
+    .worker-section {
+      display: none;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 13px 30px;
+      border: none;
+      border-radius: 7px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .submit {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .clear {
+      background: #e0e0e0;
+      color: #222;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    #message {
+      display: none;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #d9f7df;
+      color: #176b2c;
+    }
+
+    .error {
+      background: #ffe0e0;
+      color: #a40000;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 15px;
+      font-weight: bold;
+    }
+
+    @media(max-width:900px) {
+
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+    }
+
+    @media(max-width:600px) {
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 10px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <h1>
+      ASHA / AWW / AWH / WHV
+      Family Details Entry Form
+    </h1>
+
+    <p>
+      Please enter the details carefully.
+    </p>
+
+  </div>
+
+
+  <!-- IDENTIFICATION -->
+
+  <div class="section">
+
+    <div class="section-title">
+      1. Identification Details
+    </div>
+
+    <div class="form-grid">
+
+      <div class="field">
+
+        <label>
+          Scheme Name <span class="required">*</span>
+        </label>
+
+        <select id="scheme_name">
+
+          <option value="">-- Select Scheme --</option>
+
+          <option>CMCHIS</option>
+          <option>PM-JAY</option>
+          <option>AB-PMJAY</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          ID_Number <span class="required">*</span>
+        </label>
+
+        <input id="id_number"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          error_code <span class="required">*</span>
+        </label>
+
+        <input id="error_code"
+               type="text">
+
+      </div>
+
+
+      <div class="field full">
+
+        <label>
+          error_msg
+        </label>
+
+        <textarea id="error_msg"></textarea>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          family_guid <span class="required">*</span>
+        </label>
+
+        <input id="family_guid"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          family_id - RATION CARD
+          <span class="required">*</span>
+        </label>
+
+        <input id="family_id"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          member_id
+        </label>
+
+        <input id="member_id"
+               type="text">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- LOCATION -->
+
+  <div class="section">
+
+    <div class="section-title">
+      2. Location Details
+    </div>
+
+    <div class="form-grid">
+
+      <div class="field">
+
+        <label>
+          State LGD Code <span class="required">*</span>
+        </label>
+
+        <input id="state_lgd_code"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          District LGD Code <span class="required">*</span>
+        </label>
+
+        <input id="district_lgd_code"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Subdistrict LGD Code
+        </label>
+
+        <input id="subdistrict_lgd_code"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Village/Town LGD Code
+        </label>
+
+        <input id="village_town_lgd_code"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Pincode
+        </label>
+
+        <input id="pincode"
+               type="text"
+               maxlength="6">
+
+      </div>
+
+
+      <div class="field full">
+
+        <label>
+          Address
+        </label>
+
+        <textarea id="address"></textarea>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MEMBER -->
+
+  <div class="section">
+
+    <div class="section-title">
+      3. Member Details
+    </div>
+
+    <div class="form-grid">
+
+      <div class="field">
+
+        <label>
+          Member Name - English
+          <span class="required">*</span>
+        </label>
+
+        <input id="member_name_eng"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Member Name - Regional
+        </label>
+
+        <input id="member_name_regional"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Mother Name - English
+        </label>
+
+        <input id="mother_name_eng"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Mother Name - Regional
+        </label>
+
+        <input id="mother_name_regional"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Father Name - English
+        </label>
+
+        <input id="father_name_eng"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Father Name - Regional
+        </label>
+
+        <input id="father_name_regional"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Spouse Name - English
+        </label>
+
+        <input id="spouse_name_eng"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Spouse Name - Regional
+        </label>
+
+        <input id="spouse_name_regional"
+               type="text">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Year of Birth <span class="required">*</span>
+        </label>
+
+        <input id="year_of_birth"
+               type="number"
+               min="1900"
+               max="2026">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Mobile Number
+        </label>
+
+        <input id="mobile_number"
+               type="text"
+               maxlength="10">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Relation Name <span class="required">*</span>
+        </label>
+
+        <select id="relation_name">
+
+          <option value="">-- Select Relation --</option>
+
+          <option>Self</option>
+          <option>Father</option>
+          <option>Mother</option>
+          <option>Spouse</option>
+          <option>Son</option>
+          <option>Daughter</option>
+          <option>Brother</option>
+          <option>Sister</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Gender <span class="required">*</span>
+        </label>
+
+        <select id="gender">
+
+          <option value="">-- Select Gender --</option>
+
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Aadhaar Number <span class="required">*</span>
+        </label>
+
+        <input id="aadhaar_number"
+               type="text"
+               maxlength="12">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- WORKER -->
+
+  <div class="section">
+
+    <div class="section-title">
+      4. ASHA / AWW / AWH / WHV Family Details
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Are there more than one
+        (ASHA / AWW / AWH / WHV)
+        in the family?
+        <span class="required">*</span>
+      </label>
+
+      <select id="multiple_worker"
+              onchange="showWorkerFields()">
+
+        <option value="">-- Select --</option>
+
+        <option>Yes</option>
+        <option>No</option>
+
+      </select>
+
+    </div>
+
+
+    <div id="workerFields"
+         class="worker-section">
+
+      <br>
+
+      <div class="form-grid">
+
+        <div class="field full">
+
+          <label>
+            Mention ID_Numbers of all
+            ASHA / AWW / AWH / WHV
+            in the family
+          </label>
+
+          <textarea id="all_worker_ids"
+                    placeholder="Example: ID001, ID002, ID003"></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Give ID_Number of Primary
+            ASHA / AWW / AWH / WHV
+          </label>
+
+          <input id="primary_worker_id"
+                 type="text">
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- BENEFITS -->
+
+  <div class="section">
+
+    <div class="section-title">
+      5. Other Benefit Information
+    </div>
+
+    <div class="field">
+
+      <label>
+        Any other field which has direct
+        implication on benefits provided
+        to the WHV
+      </label>
+
+      <textarea id="other_benefit_field"></textarea>
+
+    </div>
+
+  </div>
+
+
+  <div class="loading"
+       id="loading">
+
+    Saving data... Please wait.
+
+  </div>
+
+
+  <div id="message"></div>
+
+
+  <div class="buttons">
+
+    <button class="submit"
+            id="submitBtn"
+            onclick="submitForm()">
+
+      SUBMIT
+
+    </button>
+
+
+    <button class="clear"
+            onclick="clearForm()">
+
+      CLEAR
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+function showWorkerFields() {
+
+  const value =
+    document.getElementById("multiple_worker").value;
+
+  const section =
+    document.getElementById("workerFields");
+
+  if (value === "Yes") {
+
+    section.style.display = "block";
+
+  } else {
+
+    section.style.display = "none";
+
+    document.getElementById("all_worker_ids").value = "";
+    document.getElementById("primary_worker_id").value = "";
+
+  }
+
+}
+
+
+function getData() {
+
+  return {
+
+    scheme_name:
+      document.getElementById("scheme_name").value,
+
+    id_number:
+      document.getElementById("id_number").value.trim(),
+
+    error_code:
+      document.getElementById("error_code").value.trim(),
+
+    error_msg:
+      document.getElementById("error_msg").value.trim(),
+
+    family_guid:
+      document.getElementById("family_guid").value.trim(),
+
+    family_id:
+      document.getElementById("family_id").value.trim(),
+
+    member_id:
+      document.getElementById("member_id").value.trim(),
+
+    state_lgd_code:
+      document.getElementById("state_lgd_code").value.trim(),
+
+    district_lgd_code:
+      document.getElementById("district_lgd_code").value.trim(),
+
+    subdistrict_lgd_code:
+      document.getElementById("subdistrict_lgd_code").value.trim(),
+
+    village_town_lgd_code:
+      document.getElementById("village_town_lgd_code").value.trim(),
+
+    pincode:
+      document.getElementById("pincode").value.trim(),
+
+    member_name_eng:
+      document.getElementById("member_name_eng").value.trim(),
+
+    member_name_regional:
+      document.getElementById("member_name_regional").value.trim(),
+
+    mother_name_eng:
+      document.getElementById("mother_name_eng").value.trim(),
+
+    mother_name_regional:
+      document.getElementById("mother_name_regional").value.trim(),
+
+    father_name_eng:
+      document.getElementById("father_name_eng").value.trim(),
+
+    father_name_regional:
+      document.getElementById("father_name_regional").value.trim(),
+
+    spouse_name_eng:
+      document.getElementById("spouse_name_eng").value.trim(),
+
+    spouse_name_regional:
+      document.getElementById("spouse_name_regional").value.trim(),
+
+    year_of_birth:
+      document.getElementById("year_of_birth").value,
+
+    mobile_number:
+      document.getElementById("mobile_number").value.trim(),
+
+    relation_name:
+      document.getElementById("relation_name").value,
+
+    gender:
+      document.getElementById("gender").value,
+
+    address:
+      document.getElementById("address").value.trim(),
+
+    aadhaar_number:
+      document.getElementById("aadhaar_number").value.trim(),
+
+    multiple_worker:
+      document.getElementById("multiple_worker").value,
+
+    all_worker_ids:
+      document.getElementById("all_worker_ids").value.trim(),
+
+    primary_worker_id:
+      document.getElementById("primary_worker_id").value.trim(),
+
+    other_benefit_field:
+      document.getElementById("other_benefit_field").value.trim()
+
+  };
+
+}
+
+
+function submitForm() {
+
+  const btn =
+    document.getElementById("submitBtn");
+
+  const loading =
+    document.getElementById("loading");
+
+  const message =
+    document.getElementById("message");
+
+  const data = getData();
+
+  btn.disabled = true;
+
+  loading.style.display = "block";
+
+  message.style.display = "none";
+
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      loading.style.display = "none";
+
+      message.className = "success";
+
+      message.innerHTML =
+        "✓ Data submitted successfully.";
+
+      message.style.display = "block";
+
+      clearForm(false);
+
+      btn.disabled = false;
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      loading.style.display = "none";
+
+      message.className = "error";
+
+      message.innerHTML =
+        "Error: " + error.message;
+
+      message.style.display = "block";
+
+      btn.disabled = false;
+
+    })
+
+    .submitForm(data);
+
+}
+
+
+function clearForm(showMessage = true) {
+
+  document.querySelectorAll(
+    "input, textarea, select"
+  ).forEach(function(element) {
+
+    element.value = "";
+
+  });
+
+  document.getElementById("workerFields")
+    .style.display = "none";
+
+  if (showMessage) {
+
+    const message =
+      document.getElementById("message");
+
+    message.className = "";
+
+    message.style.display = "none";
+
+  }
+
+}
+
+</script>
+
+</body>
+
+</html>
